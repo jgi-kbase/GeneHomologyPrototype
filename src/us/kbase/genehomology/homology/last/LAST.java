@@ -29,6 +29,7 @@ public class LAST {
 	private final int lastTimeoutSec;
 	
 	//TODO AAA All the code in this repo is prototype. It all needs to be rewritten to prod quality.
+	//TODO CODE there's quite a bit of similarity with the AssemblyHomologyService. Shared repo?
 	
 	public LAST(final Path tempFileDirectory, final int lastTimeoutSec)
 			throws GeneHomologyException { //TODO CODE make init exception
