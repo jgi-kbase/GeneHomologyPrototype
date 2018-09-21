@@ -11,6 +11,7 @@ public class AlignedSequence {
 	final private int alignmentLength;
 	final private boolean forwardStrand;
 
+	// could use a builder, although everything is required
 	public AlignedSequence(
 			final String id,
 			final int sequenceLength,

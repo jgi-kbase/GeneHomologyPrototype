@@ -49,6 +49,7 @@ public class LAST {
 	public List<SequenceSearchResult> search(final Path searchDB, final Path queryFasta)
 			throws GeneHomologyException {
 		Path tempFile = null;
+		// check .prj file exists for searchDB
 		try {
 			tempFile = Files.createTempFile(tempFileDirectory, "mash_output", ".tmp");
 			runLASTToOutputFile(tempFile, searchDB.toString(), queryFasta.toString());
@@ -76,14 +77,14 @@ public class LAST {
 			// it's far less complicated if we just redirect to a file rather than have
 			// threads consuming output and error so they don't deadlock
 			pb.redirectOutput(outputPath.toFile());
-			final Process mash = pb.start();
-			if (!mash.waitFor(lastTimeoutSec, TimeUnit.SECONDS)) {
+			final Process last = pb.start();
+			if (!last.waitFor(lastTimeoutSec, TimeUnit.SECONDS)) {
 				// not sure how to test this
 				throw new GeneHomologyException(String.format(
 						"Timed out waiting for %s to run", LAST_ALIGN));
 			}
-			if (mash.exitValue() != 0) {
-				try (final InputStream is = mash.getErrorStream()) {
+			if (last.exitValue() != 0) {
+				try (final InputStream is = last.getErrorStream()) {
 					throw new GeneHomologyException(String.format(
 							"Error running %s: %s", LAST_ALIGN, IOUtils.toString(is).trim()));
 				}
