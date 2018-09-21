@@ -1,0 +1,16 @@
+## Settings for the gene homology service and CLI.
+# Make a copy, fill in as required, and set ASSEMBLY_HOMOLOGY_CONFIG to point to the
+# new file before starting the server.
+
+[genehomology]
+
+# A directory to use for temporary files:
+temp-dir=./genehomology_temp
+
+# The timeout, in seconds, of the homology search process. The default is 120 seconds.
+#homology-timeout=300
+
+# If "true", make the server ignore the X-Forwarded-For and X-Real-IP headers. Otherwise
+# (the default behavior), the logged IP address for a request, in order of precedence, is
+# 1) the first address in X-Forwarded-For, 2) X-Real-IP, and 3) the address of the client.
+dont-trust-x-ip-headers=false
