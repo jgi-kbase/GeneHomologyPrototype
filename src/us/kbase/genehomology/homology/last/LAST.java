@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.IOUtils;
 
 import us.kbase.genehomology.homology.AlignedSequence;
-import us.kbase.genehomology.homology.GeneHomologyException;
+import us.kbase.genehomology.homology.GeneHomologyImplementationException;
 import us.kbase.genehomology.homology.SequenceSearchResult;
 
 public class LAST {
@@ -32,7 +32,7 @@ public class LAST {
 	//TODO CODE there's quite a bit of similarity with the AssemblyHomologyService. Shared repo?
 	
 	public LAST(final Path tempFileDirectory, final int lastTimeoutSec)
-			throws GeneHomologyException { //TODO CODE make init exception
+			throws GeneHomologyImplementationException { //TODO CODE make init exception
 		checkNotNull(tempFileDirectory, "tempFileDirectory");
 		if (lastTimeoutSec < 1) {
 			throw new IllegalArgumentException("mashTimeout must be > 0");
@@ -42,13 +42,13 @@ public class LAST {
 		try {
 			Files.createDirectories(tempFileDirectory);
 		} catch (IOException e) {
-			throw new GeneHomologyException( //TODO CODE init exception
+			throw new GeneHomologyImplementationException( //TODO CODE init exception
 					"Couldn't create temporary directory: " + e.getMessage(), e);
 		}
 	}
 	
 	public List<SequenceSearchResult> search(final Path searchDB, final Path queryFasta)
-			throws GeneHomologyException {
+			throws GeneHomologyImplementationException {
 		Path tempFile = null;
 		// check .prj file exists for searchDB
 		try {
@@ -57,20 +57,20 @@ public class LAST {
 			return processLASTOutput(tempFile);
 			// all of the below is really hard to test
 		} catch (IOException e) {
-			throw new GeneHomologyException(e.getMessage(), e);
+			throw new GeneHomologyImplementationException(e.getMessage(), e);
 		} finally {
 			if (tempFile != null) {
 				try {
 					Files.delete(tempFile);
 				} catch (IOException e) {
-					throw new GeneHomologyException(e.getMessage(), e);
+					throw new GeneHomologyImplementationException(e.getMessage(), e);
 				}
 			}
 		}
 	}
 	
 	private void runLASTToOutputFile(final Path outputPath, final String... arguments)
-			throws GeneHomologyException {
+			throws GeneHomologyImplementationException {
 		final List<String> command = new LinkedList<>(Arrays.asList(LAST_ALIGN));
 		command.addAll(Arrays.asList(arguments));
 		try {
@@ -81,24 +81,24 @@ public class LAST {
 			final Process last = pb.start();
 			if (!last.waitFor(lastTimeoutSec, TimeUnit.SECONDS)) {
 				// not sure how to test this
-				throw new GeneHomologyException(String.format(
+				throw new GeneHomologyImplementationException(String.format(
 						"Timed out waiting for %s to run", LAST_ALIGN));
 			}
 			if (last.exitValue() != 0) {
 				try (final InputStream is = last.getErrorStream()) {
-					throw new GeneHomologyException(String.format(
+					throw new GeneHomologyImplementationException(String.format(
 							"Error running %s: %s", LAST_ALIGN, IOUtils.toString(is).trim()));
 				}
 			}
 		} catch (IOException | InterruptedException e) {
 			// this is also very difficult to test
-			throw new GeneHomologyException(String.format(
+			throw new GeneHomologyImplementationException(String.format(
 					"Error running %s: ", LAST_ALIGN) + e.getMessage(), e);
 		}
 	}
 	
 	final List<SequenceSearchResult> processLASTOutput(final Path output)
-			throws IOException, GeneHomologyException {
+			throws IOException, GeneHomologyImplementationException {
 		final List<SequenceSearchResult> ret = new ArrayList<>();
 		try (final InputStream is = Files.newInputStream(output)) {
 			final BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -143,18 +143,18 @@ public class LAST {
 			final List<String> recordLines,
 			final String firstLine,
 			final BufferedReader br)
-			throws GeneHomologyException, IOException {
+			throws GeneHomologyImplementationException, IOException {
 		recordLines.clear();
 		if (firstLine == null) {
 			//TODO CODE better info about record
-			throw new GeneHomologyException("Bad record in LAST output");
+			throw new GeneHomologyImplementationException("Bad record in LAST output");
 		}
 		recordLines.add(firstLine);
 		for (int i = 1; i <= 2; i++) {
 			final String line = br.readLine();
 			if (line == null) {
 				//TODO CODE better info about record
-				throw new GeneHomologyException("Bad record in LAST output");
+				throw new GeneHomologyImplementationException("Bad record in LAST output");
 			}
 			recordLines.add(line);
 		}
