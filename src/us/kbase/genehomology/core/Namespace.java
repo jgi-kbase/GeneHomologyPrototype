@@ -51,7 +51,7 @@ public class Namespace {
 	/** Get the database associated with the namespace.
 	 * @return the sketch database.
 	 */
-	public GeneHomologyDatabase getSketchDatabase() {
+	public GeneHomologyDatabase getDatabase() {
 		return homologyDatabase;
 	}
 

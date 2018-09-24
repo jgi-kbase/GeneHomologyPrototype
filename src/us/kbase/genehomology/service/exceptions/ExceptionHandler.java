@@ -12,9 +12,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableMap;
 
 import us.kbase.genehomology.service.SLF4JAutoLogger;
+import us.kbase.genehomology.service.Fields;
 
 
-/** Handler for exceptions thrown by the Assembly Homology service.
+/** Handler for exceptions thrown by the Gene Homology service.
  * @author gaprice@lbl.gov
  *
  */
@@ -46,7 +47,7 @@ public class ExceptionHandler implements ExceptionMapper<Throwable> {
 		final ErrorMessage em = new ErrorMessage(ex, logger.getCallID(), clock.instant());
 		return Response
 				.status(em.getHttpcode())
-				.entity(ImmutableMap.of("error", em)) //TODO NOW put "error" in a field
+				.entity(ImmutableMap.of(Fields.ERROR, em))
 				.type(MediaType.APPLICATION_JSON)
 				.build();
 	}

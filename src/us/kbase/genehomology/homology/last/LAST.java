@@ -47,13 +47,20 @@ public class LAST {
 		}
 	}
 	
+	// TODO NOW this should take a genome homology DB
 	public List<SequenceSearchResult> search(final Path searchDB, final Path queryFasta)
 			throws GeneHomologyImplementationException {
 		Path tempFile = null;
-		// check .prj file exists for searchDB
+		final String searchDBStr;
+		if (searchDB.toString().endsWith(".prj")) {
+			searchDBStr = searchDB.toString().substring(0, searchDB.toString().length() - 4);
+		} else {
+			searchDBStr = searchDB.toString();
+		}
+		// TODO NOW check .prj file exists for searchDBStr
 		try {
 			tempFile = Files.createTempFile(tempFileDirectory, "mash_output", ".tmp");
-			runLASTToOutputFile(tempFile, searchDB.toString(), queryFasta.toString());
+			runLASTToOutputFile(tempFile, searchDBStr, queryFasta.toString());
 			return processLASTOutput(tempFile);
 			// all of the below is really hard to test
 		} catch (IOException e) {

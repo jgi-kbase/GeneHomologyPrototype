@@ -10,12 +10,14 @@ import javax.ws.rs.core.MediaType;
 
 import com.google.common.collect.ImmutableMap;
 
+import us.kbase.genehomology.service.Fields;
+
 /** The root of the server - returns basic information about the service, like
  * the server name, the version, the server local time, and the git hash from the build.
  * @author gaprice@lbl.gov
  *
  */
-@Path("/")
+@Path(ServicePaths.ROOT)
 public class Root {
 	
 	//TODO NOW show git commit
@@ -35,9 +37,9 @@ public class Root {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Map<String, Object> rootJSON() {
 		return ImmutableMap.of(
-				"servername", SERVER_NAME,
-				"version", VERSION,
-				"servertime", Instant.now().toEpochMilli());
+				Fields.SERVER_NAME, SERVER_NAME,
+				Fields.VERSION, VERSION,
+				Fields.SERVER_TIME, Instant.now().toEpochMilli());
 	}
 
 }
