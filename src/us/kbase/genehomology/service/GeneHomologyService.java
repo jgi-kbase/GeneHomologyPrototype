@@ -22,7 +22,6 @@ public class GeneHomologyService extends ResourceConfig {
 	
 	@SuppressWarnings("unused")
 	private final SLF4JAutoLogger logger; //keep a reference to prevent GC
-	// TODO NOWNOW use java-fasta-utils to check fasta format & check only 1 query
 	
 	public GeneHomologyService()
 			throws GeneHomologyConfigurationException {
