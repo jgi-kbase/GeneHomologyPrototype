@@ -158,7 +158,7 @@ public class Namespaces {
 			Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
 			validateFASTA(tempFile);
 			seqs = new LAST(tempDir, 120).search(
-					ns.getDatabase().getLocation().getPathToFile().get(), tempFile);
+					ns.getDatabase().getName(), ns.getDatabase().getLocation(), tempFile);
 		} finally {
 			if (tempFile != null) {
 				Files.delete(tempFile);
@@ -174,6 +174,7 @@ public class Namespaces {
 		return ret;
 	}
 
+	// this should live in the core code when it exists
 	private void validateFASTA(final Path tempFile)
 			throws IllegalParameterException, FileNotFoundException, IOException {
 		try (final FASTAFileParser p = new FASTAFileParser(

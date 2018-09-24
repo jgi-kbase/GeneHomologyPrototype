@@ -14,17 +14,33 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 
+import us.kbase.genehomology.core.exceptions.IllegalParameterException;
+import us.kbase.genehomology.core.exceptions.MissingParameterException;
 import us.kbase.genehomology.homology.AlignedSequence;
+import us.kbase.genehomology.homology.GeneHomologyDBLocation;
+import us.kbase.genehomology.homology.GeneHomologyDBName;
+import us.kbase.genehomology.homology.GeneHomologyDatabase;
 import us.kbase.genehomology.homology.GeneHomologyImplementationException;
+import us.kbase.genehomology.homology.GeneHomologyImplementationName;
 import us.kbase.genehomology.homology.SequenceSearchResult;
 
 public class LAST {
 	
 	private static final String LAST_ALIGN = "lastal";
+	private static final GeneHomologyImplementationName NAME;
+	static {
+		try {
+			NAME = new GeneHomologyImplementationName("last");
+		} catch (IllegalParameterException | MissingParameterException e) {
+			throw new RuntimeException("You big dummy", e);
+		}
+	}
+	
 	private final Path tempFileDirectory;
 	private final int lastTimeoutSec;
 	
@@ -47,20 +63,45 @@ public class LAST {
 		}
 	}
 	
-	// TODO NOW this should take a genome homology DB
-	public List<SequenceSearchResult> search(final Path searchDB, final Path queryFasta)
+	public GeneHomologyDatabase getDatabase(
+			final GeneHomologyDBName dbName,
+			final GeneHomologyDBLocation loc)
 			throws GeneHomologyImplementationException {
-		Path tempFile = null;
-		final String searchDBStr;
-		if (searchDB.toString().endsWith(".prj")) {
-			searchDBStr = searchDB.toString().substring(0, searchDB.toString().length() - 4);
-		} else {
-			searchDBStr = searchDB.toString();
+		checkNotNull(dbName, "dbName");
+		checkNotNull(loc, "loc");
+		final Properties props = new Properties();
+		try (final InputStream is = Files.newInputStream(loc.getPathToFile().get())) {
+			props.load(is);
+		} catch (IOException e) {
+			throw new GeneHomologyImplementationException(String.format(
+					"Couldn't open LAST database file %s: %s",
+					loc.getPathToFile().get(), e.getMessage()), e);
 		}
-		// TODO NOW check .prj file exists for searchDBStr
+		if (!props.containsKey("numofsequences")) { // could check a couple more keys
+			throw new GeneHomologyImplementationException(String.format(
+					"File %s is not a LAST database file", loc.getPathToFile().get()));
+		}
+		return new GeneHomologyDatabase(
+				dbName,
+				NAME,
+				loc,
+				Integer.parseInt(props.getProperty("numofsequences")));
+	}
+	
+	public List<SequenceSearchResult> search(
+			final GeneHomologyDBName dbName,
+			final GeneHomologyDBLocation searchDB,
+			final Path queryFasta)
+			throws GeneHomologyImplementationException {
+		checkNotNull(queryFasta, "queryFasta");
+		@SuppressWarnings("unused")
+		final GeneHomologyDatabase db = getDatabase(dbName, searchDB); //TODO NOW return
+		Path tempFile = null;
+		String dbpath = searchDB.getPathToFile().get().toString();
+		dbpath = dbpath.substring(0, dbpath.length() - 4); // remove .prj
 		try {
-			tempFile = Files.createTempFile(tempFileDirectory, "mash_output", ".tmp");
-			runLASTToOutputFile(tempFile, searchDBStr, queryFasta.toString());
+			tempFile = Files.createTempFile(tempFileDirectory, "last_output", ".tmp");
+			runLASTToOutputFile(tempFile, dbpath, queryFasta.toString());
 			return processLASTOutput(tempFile);
 			// all of the below is really hard to test
 		} catch (IOException e) {
@@ -169,8 +210,18 @@ public class LAST {
 
 	public static void main(final String[] args) throws Exception {
 		final LAST l = new LAST(Paths.get("./temp_delete"), 300);
+		
+		final GeneHomologyDatabase db = l.getDatabase(
+				new GeneHomologyDBName("foo"),
+				new GeneHomologyDBLocation(Paths.get(
+						"/media/mongohd/genehom/LAST/uniref50_40Mlines.last.prj")));
+		
+		System.out.println(db);
+		
 		final List<SequenceSearchResult> seqs = l.search(
-				Paths.get("/media/mongohd/genehom/LAST/uniref50_40Mlines.last"),
+				new GeneHomologyDBName("foo"),
+				new GeneHomologyDBLocation(Paths.get(
+						"/media/mongohd/genehom/LAST/uniref50_40Mlines.last.prj")),
 				Paths.get("/media/mongohd/genehom/LAST/UniRef50_A0A257EYX4.fasta"));
 		
 		for (final SequenceSearchResult ssr: seqs) {
