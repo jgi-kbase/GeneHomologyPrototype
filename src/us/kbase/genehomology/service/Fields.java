@@ -42,7 +42,7 @@ public class Fields {
 	/* Aligment results */
 	/** A set of alignments from a query sequence to one or more reference sequences. */
 	public static final String ALIGNMENTS = "alignments";
-	/** The implementation used to calculate the alignements. */
+	/** The implementation used to calculate the alignments. */
 	public static final String ALIGN_IMPLEMENTATION = "impl";
 	/** A set of namespaces. */
 	public static final String ALIGN_NAMESPACES = "namespaces";

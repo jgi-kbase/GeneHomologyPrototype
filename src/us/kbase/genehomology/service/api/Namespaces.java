@@ -47,8 +47,6 @@ import us.kbase.genehomology.service.Fields;
 @javax.ws.rs.Path(ServicePaths.NAMESPACE_ROOT)
 public class Namespaces {
 	
-	//TODO NOWNOW error handler not working
-
 	private final java.nio.file.Path tempDir;
 	private static final Namespace ns;
 	static {
