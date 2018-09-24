@@ -11,9 +11,9 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
-import ch.qos.logback.core.net.SocketConnector.ExceptionHandler;
 import us.kbase.genehomology.config.GeneHomologyConfig;
 import us.kbase.genehomology.config.GeneHomologyConfigurationException;
+import us.kbase.genehomology.service.exceptions.ExceptionHandler;
 
 public class GeneHomologyService extends ResourceConfig {
 	
@@ -22,7 +22,6 @@ public class GeneHomologyService extends ResourceConfig {
 	
 	@SuppressWarnings("unused")
 	private final SLF4JAutoLogger logger; //keep a reference to prevent GC
-	// TODO NOWNOW use java-fasta-utils to check fasta format & check only 1 query
 	
 	public GeneHomologyService()
 			throws GeneHomologyConfigurationException {

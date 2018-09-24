@@ -1,5 +1,6 @@
 package us.kbase.genehomology.service.api;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -24,6 +25,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.yeastrc.proteomics.fasta.FASTADataErrorException;
+import org.yeastrc.proteomics.fasta.FASTAEntry;
+import org.yeastrc.proteomics.fasta.FASTAFileLineReaderFactory;
+import org.yeastrc.proteomics.fasta.FASTAFileParser;
+
 import us.kbase.genehomology.config.GeneHomologyConfig;
 import us.kbase.genehomology.core.DataSourceID;
 import us.kbase.genehomology.core.Namespace;
@@ -47,8 +53,6 @@ import us.kbase.genehomology.service.Fields;
 @javax.ws.rs.Path(ServicePaths.NAMESPACE_ROOT)
 public class Namespaces {
 	
-	//TODO NOWNOW error handler not working
-
 	private final java.nio.file.Path tempDir;
 	private static final Namespace ns;
 	static {
@@ -152,6 +156,7 @@ public class Namespaces {
 		try (final InputStream is = request.getInputStream()) {
 			tempFile = Files.createTempFile(tempDir, "genehomol_input", ".tmp.fasta");
 			Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
+			validateFASTA(tempFile);
 			seqs = new LAST(tempDir, 120).search(
 					ns.getDatabase().getLocation().getPathToFile().get(), tempFile);
 		} finally {
@@ -167,6 +172,36 @@ public class Namespaces {
 				.map(s -> fromSearchResult(s))
 				.collect(Collectors.toList()));
 		return ret;
+	}
+
+	private void validateFASTA(final Path tempFile)
+			throws IllegalParameterException, FileNotFoundException, IOException {
+		try (final FASTAFileParser p = new FASTAFileParser(
+				FASTAFileLineReaderFactory.getInstance()
+					.getFASTAFileLineReader(tempFile.toFile()))) {
+			final FASTAEntry e = p.getNextEntry();
+			if (e == null) {
+				throw new IllegalParameterException("Empty input FASTA file");
+			}
+			if (p.getNextEntry() != null) {
+				throw new IllegalParameterException(
+						"FASTA input must contain exactly one sequence");
+			}
+		} catch (IllegalParameterException e) {
+			throw e;
+		} catch (FASTADataErrorException e) {
+			throw new IllegalParameterException("Invalid input FASTA: " + e.getMessage(), e);
+		} catch (FileNotFoundException e) {
+			throw e; // there's something really messed up here
+			// this is really hard to test
+		} catch (IOException e) {
+			throw e; // this is really hard to test
+		} catch (Exception e) {
+			// FASTAFileParser.close() throws exception instead of IOException for some
+			// reason, even though the method it calls only throws IOException
+			// this is really hard to test
+			throw (IOException) e;
+		}
 	}
 
 
