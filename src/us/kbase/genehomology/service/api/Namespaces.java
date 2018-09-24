@@ -26,9 +26,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.yeastrc.proteomics.fasta.FASTADataErrorException;
-import org.yeastrc.proteomics.fasta.FASTAEntry;
-import org.yeastrc.proteomics.fasta.FASTAFileLineReaderFactory;
 import org.yeastrc.proteomics.fasta.FASTAFileParser;
+import org.yeastrc.proteomics.fasta.FASTAFileParserFactory;
 
 import us.kbase.genehomology.config.GeneHomologyConfig;
 import us.kbase.genehomology.core.DataSourceID;
@@ -177,31 +176,17 @@ public class Namespaces {
 	// this should live in the core code when it exists
 	private void validateFASTA(final Path tempFile)
 			throws IllegalParameterException, FileNotFoundException, IOException {
-		try (final FASTAFileParser p = new FASTAFileParser(
-				FASTAFileLineReaderFactory.getInstance()
-					.getFASTAFileLineReader(tempFile.toFile()))) {
-			final FASTAEntry e = p.getNextEntry();
-			if (e == null) {
+		try (final FASTAFileParser p = FASTAFileParserFactory.getInstance()
+				.getFASTAFileParser(tempFile.toFile())) {
+			if (p.getNextEntry() == null) {
 				throw new IllegalParameterException("Empty input FASTA file");
 			}
 			if (p.getNextEntry() != null) {
 				throw new IllegalParameterException(
 						"FASTA input must contain exactly one sequence");
 			}
-		} catch (IllegalParameterException e) {
-			throw e;
 		} catch (FASTADataErrorException e) {
 			throw new IllegalParameterException("Invalid input FASTA: " + e.getMessage(), e);
-		} catch (FileNotFoundException e) {
-			throw e; // there's something really messed up here
-			// this is really hard to test
-		} catch (IOException e) {
-			throw e; // this is really hard to test
-		} catch (Exception e) {
-			// FASTAFileParser.close() throws exception instead of IOException for some
-			// reason, even though the method it calls only throws IOException
-			// this is really hard to test
-			throw (IOException) e;
 		}
 	}
 
