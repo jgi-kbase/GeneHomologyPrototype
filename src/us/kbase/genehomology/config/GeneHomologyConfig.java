@@ -46,6 +46,10 @@ public class GeneHomologyConfig {
 	private static final String KEY_TEMP_DIR = "temp-dir";
 	private static final String KEY_IGNORE_IP_HEADERS = "dont-trust-x-ip-headers";
 	
+	// these are both super hacky prototypy shite
+	private static final String KEY_NAMESPACE_YAML = "namespace-yaml-file";
+	private static final String KEY_LAST_PRJ_FILE = "last-prj-file";
+	
 	private static final String KEY_HOMOLOGY_TIMEOUT = "homology-timeout";
 	
 	// in seconds
@@ -58,6 +62,8 @@ public class GeneHomologyConfig {
 	private final SLF4JAutoLogger logger;
 	private final boolean ignoreIPHeaders;
 	private final int homologyTimeoutSec;
+	private final Path namespaceYAMLFile;
+	private final Path lastProjectFile;
 
 	/** Create a new configuration.
 	 * 
@@ -109,6 +115,8 @@ public class GeneHomologyConfig {
 		tempDir = Paths.get(getString(KEY_TEMP_DIR, cfg, true));
 		homologyTimeoutSec = getInt(KEY_HOMOLOGY_TIMEOUT, cfg, DEFAULT_HOMOLOGY_TIMEOUT,
 				MINIMUM_HOMOLOGY_TIMEOUT);
+		namespaceYAMLFile = Paths.get(getString(KEY_NAMESPACE_YAML, cfg, true));
+		lastProjectFile = Paths.get(getString(KEY_LAST_PRJ_FILE, cfg, true));
 	}
 	
 	private int getInt(
@@ -250,7 +258,7 @@ public class GeneHomologyConfig {
 			return JsonServerSyslog.getCurrentRpcInfo().getId();
 		}
 	}
-	
+
 	/** Get the timeout to use for any homology search processes.
 	 * @return the timeout in seconds.
 	 */
@@ -279,6 +287,16 @@ public class GeneHomologyConfig {
 	 */
 	public boolean isIgnoreIPHeaders() {
 		return ignoreIPHeaders;
+	}
+	
+	// next 2 are hacky bullpucky
+	
+	public Path getNamespaceYAMLFile() {
+		return namespaceYAMLFile;
+	}
+	
+	public Path getLASTProjectFile() {
+		return lastProjectFile;
 	}
 	
 	public static void main(final String[] args) throws Exception {

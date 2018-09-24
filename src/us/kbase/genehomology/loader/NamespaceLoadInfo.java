@@ -62,9 +62,13 @@ public class NamespaceLoadInfo {
 		sourceDatabaseID = Optional.fromNullable(
 				getString(data, "sourcedatabase", sourceInfo, true));
 		description = Optional.fromNullable(getString(data, "description", sourceInfo, true));
-		final String mdate = getString(data, "moddate", sourceInfo, false);
+		final Object mdate = data.get("moddate");
+		if (!(mdate instanceof Number)) {
+			throw new LoadInputParseException(String.format(
+					"moddate %s is not in epoch seconds in %s", mdate, sourceInfo)); 
+		}
 		try {
-			modificationDate = Instant.ofEpochSecond(Long.parseLong(mdate));
+			modificationDate = Instant.ofEpochSecond(((Number)mdate).longValue());
 		} catch (NumberFormatException e) {
 			throw new LoadInputParseException("moddate is not in epoch seconds in " + sourceInfo);
 		}

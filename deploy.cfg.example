@@ -4,6 +4,12 @@
 
 [genehomology]
 
+# A path to a namespace YAML file (see README.md).
+namespace-yaml-file=path/to/namespace/yaml
+
+# A path to a LAST project (*.prj) file.
+last-prj-file=/path/to/last.prj
+
 # A directory to use for temporary files:
 temp-dir=./genehomology_temp
 

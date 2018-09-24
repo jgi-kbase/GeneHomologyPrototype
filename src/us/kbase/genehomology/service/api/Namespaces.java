@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,17 +28,12 @@ import org.yeastrc.proteomics.fasta.FASTAFileParser;
 import org.yeastrc.proteomics.fasta.FASTAFileParserFactory;
 
 import us.kbase.genehomology.config.GeneHomologyConfig;
-import us.kbase.genehomology.core.DataSourceID;
 import us.kbase.genehomology.core.Namespace;
 import us.kbase.genehomology.core.NamespaceID;
 import us.kbase.genehomology.core.exceptions.IllegalParameterException;
 import us.kbase.genehomology.core.exceptions.MissingParameterException;
 import us.kbase.genehomology.core.exceptions.NoSuchNamespaceException;
-import us.kbase.genehomology.homology.GeneHomologyDBLocation;
-import us.kbase.genehomology.homology.GeneHomologyDBName;
-import us.kbase.genehomology.homology.GeneHomologyDatabase;
 import us.kbase.genehomology.homology.GeneHomologyImplementationException;
-import us.kbase.genehomology.homology.GeneHomologyImplementationName;
 import us.kbase.genehomology.homology.SequenceSearchResult;
 import us.kbase.genehomology.homology.last.LAST;
 import us.kbase.genehomology.service.Fields;
@@ -53,32 +46,14 @@ import us.kbase.genehomology.service.Fields;
 public class Namespaces {
 	
 	private final java.nio.file.Path tempDir;
-	private static final Namespace ns;
-	static {
-		try {
-			ns = Namespace.getBuilder(
-					new NamespaceID("testns"),
-					new GeneHomologyDatabase(
-							new GeneHomologyDBName("testns"),
-							new GeneHomologyImplementationName("last"),
-							new GeneHomologyDBLocation(Paths.get(
-									"/media/mongohd/genehom/LAST/uniref50_40Mlines.last.prj")),
-							6000000),
-					Instant.now())
-					.withNullableDataSourceID(new DataSourceID("ds"))
-					.withNullableDescription("desc")
-					.withNullableSourceDatabaseID("sourcedb")
-					.build();
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
+	private final Namespace ns;
 	
 	/** Construct the handler. This is typically done by the Jersey framework.
 	 * @param cfg the configuration for the gene homology service.
 	 */
 	@Inject
-	public Namespaces(final GeneHomologyConfig cfg) {
+	public Namespaces(final Namespace ns, final GeneHomologyConfig cfg) {
+		this.ns = ns;
 		this.tempDir = cfg.getPathToTemporaryFileDirectory();
 	}
 
