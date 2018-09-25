@@ -183,9 +183,8 @@
 
   <target name="docker_image" depends="buildwar" description="build the docker image">
     <!-- make the docker image -->
-    <exec executable="./build/build_docker_image.sh">
+    <exec executable="./build/build_docker_image.sh" failonerror="true">
     </exec>
-
   </target>
 
   <target name="javadoc" description="build javadocs">
