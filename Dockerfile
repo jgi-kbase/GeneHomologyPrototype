@@ -5,7 +5,7 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG BRANCH=develop
 
-RUN apt-get -y update && apt-get -y install ant git openjdk-8-jdk make g++
+RUN apt-get -y update && apt-get -y install ant git openjdk-8-jdk make g++ libz-dev
 
 COPY deployment/ /kb/deployment/
 COPY jettybase/ /kb/deployment/jettybase/
