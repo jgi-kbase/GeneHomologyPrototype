@@ -24,7 +24,7 @@ install:
   - export JARSDIR=`pwd`/jars/lib/jars/
 
   - export LAST_VER=last-956
-  - wget ftp://ftp.kbase.us/pub/$LAST_VER.zip
+  - wget -O $LAST_VER.zip https://www.dropbox.com/s/mj528m2ylp0nty5/$LAST_VER.zip?dl=1
   - unzip $LAST_VER.zip
   - cd $LAST_VER
   - make
