@@ -1,8 +1,8 @@
-package us.kbase.genehomology.loader;
+package us.kbase.genehomology.load;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static us.kbase.genehomology.loader.ParseHelpers.getString;
-import static us.kbase.genehomology.loader.ParseHelpers.fromYAML;
+import static us.kbase.genehomology.load.ParseHelpers.fromYAML;
+import static us.kbase.genehomology.load.ParseHelpers.getString;
 
 import java.io.InputStream;
 import java.time.Instant;
@@ -141,7 +141,6 @@ public class NamespaceLoadInfo {
 	
 	/** Create a namespace from the load info.
 	 * @param db the database associated with the namespace.
-	 * @param creation the time the namespace was created.
 	 * @return the new namespace.
 	 */
 	public Namespace toNamespace(final GeneHomologyDatabase db) {

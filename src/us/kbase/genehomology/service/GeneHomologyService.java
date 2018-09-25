@@ -21,7 +21,7 @@ import us.kbase.genehomology.homology.GeneHomologyDBName;
 import us.kbase.genehomology.homology.GeneHomologyDatabase;
 import us.kbase.genehomology.homology.GeneHomologyImplementationException;
 import us.kbase.genehomology.homology.last.LAST;
-import us.kbase.genehomology.loader.NamespaceLoadInfo;
+import us.kbase.genehomology.load.NamespaceLoadInfo;
 import us.kbase.genehomology.loader.exceptions.LoadInputParseException;
 import us.kbase.genehomology.service.exceptions.ExceptionHandler;
 

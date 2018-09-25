@@ -1,4 +1,4 @@
-package us.kbase.genehomology.loader;
+package us.kbase.genehomology.load;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static us.kbase.genehomology.util.Util.exceptOnEmpty;
