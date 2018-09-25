@@ -18,6 +18,7 @@ before_install:
   - sudo apt-get install -y ant-optional
 
 install:
+  - export CURDIR=$PWD
   - cd ..
   - git clone https://github.com/kbase/jars
   - export JARSDIR=`pwd`/jars/lib/jars/
@@ -28,7 +29,7 @@ install:
   - cd $LAST_VER
   - make
   - export PATH=$PATH:$PWD/src
-  - cd -
+  - cd $CURDIR
 
 script:
 #  - cd ..
