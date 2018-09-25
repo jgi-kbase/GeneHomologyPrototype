@@ -28,7 +28,7 @@ RUN cd /opt \
   && cd last-956 \
   && make
 
-ENV PATH=/bin:/usr/bin:/kb/deployment/bin:$PWD/src
+ENV PATH=/bin:/usr/bin:/kb/deployment/bin:/opt/last-956/src
 
 RUN chmod -R a+rwx /kb/deployment/conf /kb/deployment/jettybase/
 
