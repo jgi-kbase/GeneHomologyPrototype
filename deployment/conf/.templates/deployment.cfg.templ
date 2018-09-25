@@ -1,0 +1,5 @@
+[genehomology]
+namespace-yaml-file={{ .Env.namespace_yaml_file }}
+last-prj-file={{ .Env.last_prj_file }}
+temp-dir={{ default .Env.temp_dir "./tmp_gh" }}
+homology-timeout={{ default .Env.minhash_timeout "120" }}
