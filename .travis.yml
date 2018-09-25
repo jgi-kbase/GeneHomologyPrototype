@@ -1,0 +1,61 @@
+dist: trusty
+sudo: required
+language: java
+jdk:
+  - openjdk8
+  - oraclejdk8
+# env:
+#     - MONGODB_VER=mongodb-linux-x86_64-2.6.12 ANT_TEST=test               WIRED_TIGER=false
+#     - MONGODB_VER=mongodb-linux-x86_64-3.0.14 ANT_TEST=test_mongo_storage WIRED_TIGER=false
+#     - MONGODB_VER=mongodb-linux-x86_64-3.0.14 ANT_TEST=test_mongo_storage WIRED_TIGER=true
+#     - MONGODB_VER=mongodb-linux-x86_64-3.2.12 ANT_TEST=test_mongo_storage WIRED_TIGER=false
+#     - MONGODB_VER=mongodb-linux-x86_64-3.2.12 ANT_TEST=test_mongo_storage WIRED_TIGER=true
+#     - MONGODB_VER=mongodb-linux-x86_64-3.4.2  ANT_TEST=test_mongo_storage WIRED_TIGER=false
+#     - MONGODB_VER=mongodb-linux-x86_64-3.4.2  ANT_TEST=test_mongo_storage WIRED_TIGER=true
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y ant-optional
+
+install:
+  - export CURDIR=$PWD
+  - cd ..
+  - git clone https://github.com/kbase/jars
+  - export JARSDIR=`pwd`/jars/lib/jars/
+
+  - export LAST_VER=last-956
+  - wget -O $LAST_VER.zip https://www.dropbox.com/s/mj528m2ylp0nty5/$LAST_VER.zip?dl=1
+  - unzip $LAST_VER.zip
+  - cd $LAST_VER
+  - make
+  - export PATH=$PATH:$PWD/src
+  - cd $CURDIR
+
+script:
+#  - cd ..
+#  - wget http://fastdl.mongodb.org/linux/$MONGODB_VER.tgz
+#  - tar xfz $MONGODB_VER.tgz
+#  - export MONGOD=`pwd`/$MONGODB_VER/bin/mongod
+#  - cd -
+#  - cp -n test.cfg.example test.cfg
+#  - sed -i "s#^test.temp.dir=.*#test.temp.dir=temp_test_dir#" test.cfg
+#  - sed -i "s#^test.mongo.exe.*#test.mongo.exe=$MONGOD#" test.cfg
+#  - sed -i "s#^test.mongo.wired_tiger.*#test.mongo.wired_tiger=$WIRED_TIGER#" test.cfg
+#  - sed -i "s#^test.jars.dir=.*#test.jars.dir=$JARSDIR#" test.cfg
+#  - cat test.cfg
+  - ant test
+
+jobs:
+  include:
+    - stage: deploy
+      env: # The following are secure declarations for DOCKER_USER, DOCKER_PASS
+        - secure: "e7XdX3tmAXWroofCyFxVdwL765wVGgcOiRsL7iW/RDuQMPO9XQp9ZT76uEZ9wkGl5igiZHWYASYbSgmpvlkkTtJRHCWrjWz+VyH1xrbCtXrAFRfXzWdYVBN5lbjLoZYiRM3EMA1E5sJjz/47OuqaMIXyT4CsNXErVNWbJeKg+nIUMvAGqzGU2JGlghM7Y1LmtW99JKCvWKe3233lhSvDCl6OCzHn5Rr6LsZFTMyeFfdxwFNX8SrjdQraMwhLrd3aOuXHjk5igaN+j0LVWoMA7jayapz6MmfV5Uz0RXM9mLfNrO3vy1YQvqYDuheRT1K/w+csPcmRVAEEirlWZHOyK/HxCvPOGoaJUc9TekVsVXDtJInvVAwXbbntLVmolbq5JZqkf7xo7guQq55gseP+vLw20bjlGkHyZw7sR9pqoWvlwmyBMVf570t9EDhWIU3EMhD5BLfZUD8PPMn57qxfzQYfS+p+YqYMvQ8jdlaGOPqHWvsTy6PGM9x0OoLsHDmmoVThtSWcbGpqeQFGc/7X+uET0UowQ5k0Jp4nK1KnxOCP6bcJo64mvLaavuXmegnkkO3ZTOyplH8A1FCHMkgNvnwVRbCxMfWWPUlo4jYXRCBJwPI06snPEFpdVAdvhvK634EqrOoMWijNqe4TI4gSd1nLwHjbkd1tM5xxuM256RU="
+        - secure: "D8GasJBp6WQniP896PhD+sKezhDyn6JM/ChAJWu7d0YA+s4PHwk/14dZRPCuKOd1NBc/LAwC1WKT8V95Z/49nzwCRkpb+3hLnJNrX28oFfrpOMNbRB+cBNmjG58fRS6gpXW8ffk0sQKC+SfF1NX28rht7rUMkPGbUikLNsc/rOb6RTBI4xWCaAwCEVZtszAHvLJd5pSN3r0LALOlWJZKV8XvtPsWIds9lHO7/gbBM1I035vJRxScCSTsS5MY25NhThmjAzgSy/tgZ95Y4KoF1TIxmzRUSYXtXMg4dQGUCBVULlqiCfBQnOFhLl0k/dEcd53fVbouKFAefI8cqrohrj4jQX2t4hpB0o9ZAOxlfzqTaS8lKevOp5s0IbCNgba1U/dQof7C9l0yXss6hr1eBVZ1N1lmTg1LfGrCnloRtYrJxQDgy6OKeJV1zs5/YV65orWBELZkkvY0uBAgv2Eop8ZAA3TfMVgA7XAfBGTnoJGXk82DJu1h5zm75QAhDn+EC6dzpODJ6yvLPLvDe7bZn9KDNBis2TlvSSprCLWvnE1pS4dzOpQGiQ1KfTSJhC3s65jOsZAVH2LQ+kaF0ETwMoKlA7y8wh7p/6uW6P2e/G3B5T5oSTHpWKEuHJtNldPmmhGtpIYN90BAWQZKxHTlwPhBkpYu/aJ4FbyKy1Uj/pI="
+      script: # Only push to dockerhub if this isn't a PR and we're updating master or develop
+        - docker pull kbase/kb_jre
+        - ant docker_image
+        - IMAGE_NAME=kbase/gene_homology build/push2dockerhub.sh
+after_success:
+  - ls test-reports
+  - bash <(curl -s https://codecov.io/bash) -f test-reports/coverage-report.xml
+
