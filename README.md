@@ -15,7 +15,7 @@ a database and a namespace. A namespace has the following properties:
 * A string uniquely identifying the source of the data (e.g. JGI, KBase, etc)
 * A string uniquely identifying the source database within the data source
 * An optional free text description
-* The implementation used to create the sketch database (e.g. LAST, BLAST)
+* The implementation used to create the sequence database (e.g. LAST, BLAST)
   
 Note that searches against a namespace **may not be reproducible over time**. 
 
@@ -29,7 +29,7 @@ Java 8 (OpenJDK OK)
 Apache Ant (http://ant.apache.org/)  
 Jetty 9.3+ (http://www.eclipse.org/jetty/download.html)
     (see jetty-config.md for version used for testing)  
-This repo (git clone https://github.com/kbaseIncubator/AssemblyHomologyService)  
+This repo (git clone https://github.com/kbaseIncubator/GeneHomologyService)  
 The jars repo (git clone https://github.com/kbase/jars)  
 The two repos above need to be in the same parent folder.
 
@@ -104,7 +104,7 @@ POST /namespace/<namespace id>/search
 Performs a search with a sequence in FASTA format provided in the `POST` body against the
 database associated with the given namespace. `curl -T` is useful for this:  
 `curl -X POST -T UniRef50_A0A257EYX4.fasta http://localhost:8080/namespace/lastns/search`  
-Currently the input database must contain only one sequence.  
+Currently the input FASTA must contain only one sequence.  
 
 ## What makes this a prototype?
 
