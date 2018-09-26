@@ -101,7 +101,7 @@ Returns information about a specific namespace.
 POST /namespace/<namespace id>/search
 ```
 
-Performs a search with a sequence in FASTA format provided in the `POST` body against the
+Performs a search with a protein sequence in FASTA format provided in the `POST` body against the
 database associated with the given namespace. `curl -T` is useful for this:  
 `curl -X POST -T UniRef50_A0A257EYX4.fasta http://localhost:8080/namespace/lastns/search`  
 Currently the input FASTA must contain only one sequence.  
@@ -118,7 +118,7 @@ Currently the input FASTA must contain only one sequence.
 * The documentation is minimal
 * The code was written in a hurry and may not follow best practices.
  
- ## Developer notes
+## Developer notes
 
 ### Adding and releasing code
 
@@ -165,3 +165,4 @@ Anything else is mapped to 500.
 * Search namespaces (no free text search)
 * HTTP2 support
 * Other seqsearch implementations?
+* Support sharded sequence databases
