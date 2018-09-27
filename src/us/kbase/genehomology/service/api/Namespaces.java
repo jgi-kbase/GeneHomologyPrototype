@@ -169,6 +169,7 @@ public class Namespaces {
 	private Map<String, Object> fromSearchResult(final SequenceSearchResult ssr) {
 		final Map<String, Object> ret = new HashMap<>();
 		ret.put(Fields.ALIGN_E_VAL, ssr.getEValue());
+		ret.put(Fields.ALIGN_BIT_SCORE, ssr.getBitScore());
 		
 		ret.put(Fields.ALIGN_SEQ1_ID, ssr.getSequence1().getId());
 		ret.put(Fields.ALIGN_SEQ1_SEQ, ssr.getSequence1().getAlignedSequence());
