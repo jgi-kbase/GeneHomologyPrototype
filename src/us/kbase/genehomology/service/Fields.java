@@ -48,6 +48,8 @@ public class Fields {
 	public static final String ALIGN_NAMESPACES = "namespaces";
 	/** The alignment e-value. */
 	public static final String ALIGN_E_VAL = "evalue";
+	/** The alignment bit score. */
+	public static final String ALIGN_BIT_SCORE = "bitscore";
 	/** The ID of the first sequence. */
 	public static final String ALIGN_SEQ1_ID = "id1";
 	/** The aligned first sequence. */

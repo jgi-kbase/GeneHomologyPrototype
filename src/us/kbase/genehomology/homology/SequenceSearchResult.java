@@ -2,27 +2,30 @@ package us.kbase.genehomology.homology;
 
 public class SequenceSearchResult {
 	
-	// %ID? last doesn't supply
+	// %ID?
 	
-	final private AlignedSequence sequence1;
-	final private AlignedSequence sequence2;
-	private double eValue;
+	private final AlignedSequence sequence1;
+	private final AlignedSequence sequence2;
+	private final double eValue;
+	private final int bitScore;
 	
 	public SequenceSearchResult(
 			final AlignedSequence sequence1,
 			final AlignedSequence sequence2,
-			final double eValue) {
+			final double eValue,
+			final int bitScore) {
 		this.sequence1 = sequence1;
 		this.sequence2 = sequence2;
 		this.eValue = eValue;
+		this.bitScore = bitScore;
 	}
 
 	public double getEValue() {
 		return eValue;
 	}
-
-	public void seteValue(double eValue) {
-		this.eValue = eValue;
+	
+	public int getBitScore() {
+		return bitScore;
 	}
 
 	public AlignedSequence getSequence1() {
@@ -38,6 +41,8 @@ public class SequenceSearchResult {
 		final int prime = 31;
 		int result = 1;
 		long temp;
+		temp = Double.doubleToLongBits(bitScore);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
 		temp = Double.doubleToLongBits(eValue);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + ((sequence1 == null) ? 0 : sequence1.hashCode());
@@ -57,6 +62,9 @@ public class SequenceSearchResult {
 			return false;
 		}
 		SequenceSearchResult other = (SequenceSearchResult) obj;
+		if (Double.doubleToLongBits(bitScore) != Double.doubleToLongBits(other.bitScore)) {
+			return false;
+		}
 		if (Double.doubleToLongBits(eValue) != Double.doubleToLongBits(other.eValue)) {
 			return false;
 		}
@@ -86,6 +94,8 @@ public class SequenceSearchResult {
 		builder.append(sequence2);
 		builder.append(", eValue=");
 		builder.append(eValue);
+		builder.append(", bitScore=");
+		builder.append(bitScore);
 		builder.append("]");
 		return builder.toString();
 	}

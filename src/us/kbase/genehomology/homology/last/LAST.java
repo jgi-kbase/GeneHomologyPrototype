@@ -152,27 +152,64 @@ public class LAST {
 			final BufferedReader br = new BufferedReader(new InputStreamReader(
 					is, StandardCharsets.UTF_8));
 			final List<String> recordLines = new ArrayList<String>(3);
+			final List<Double> lambdaAndK = getKAndLambda(br);
+			final double lambda = lambdaAndK.get(0);
+			final double K = lambdaAndK.get(1);
 			for (String line = br.readLine(); line != null; line = br.readLine()) {
 				if (line.startsWith("#") || line.trim().isEmpty()) {
 					continue;
 				}
 				set3Lines(recordLines, line, br);
-				ret.add(processLASTRecord(recordLines));
+				ret.add(processLASTRecord(recordLines, lambda, K));
 			}
 		}
 		return ret;
 	}
+	
+	// list is 2 elements, lambda then K
+	private List<Double> getKAndLambda(final BufferedReader lastOutput)
+			throws GeneHomologyImplementationException, IOException {
+		for (String line = lastOutput.readLine(); line != null; line = lastOutput.readLine()) {
+			// super fragile and hacky, yuck.
+			if (line.startsWith("#") && line.contains("K=") && line.contains("lambda=")) {
+				final String[] chunks = line.split("\\s+");
+				try {
+					final double lambda = Double.parseDouble(chunks[1].substring(7));
+					final double K = Double.parseDouble(chunks[2].substring(2));
+					return Arrays.asList(lambda, K);
+				} catch (NumberFormatException e) {
+					// basically impossible to test
+					throw new GeneHomologyImplementationException(
+							"Improperly formatted K and lambda in LAST output line: " + line);
+				}
+			}
+		}
+		// also basically impossible to test
+		throw new GeneHomologyImplementationException("Couldn't find lambda and K in LAST output");
+	}
 
-	private SequenceSearchResult processLASTRecord(final List<String> recordLines) {
+	private SequenceSearchResult processLASTRecord(
+			final List<String> recordLines,
+			final double lambda,
+			final double K) {
 		//TODO CODE lots of error checking here
 		//TODO CODE nasty & brittle
 		final String[] line1 = recordLines.get(0).split("\\s+");
 		final double eVal = Double.parseDouble(line1[3].substring(2));
+		final int score = Integer.parseInt(line1[1].substring(6));
 		return new SequenceSearchResult(
-				toAlignedSequence(recordLines.get(1)), toAlignedSequence(recordLines.get(2)),
-				eVal);
+				toAlignedSequence(recordLines.get(1)),
+				toAlignedSequence(recordLines.get(2)),
+				eVal,
+				toBitScore(score, lambda, K));
 	}
 	
+	final private static double ln2 = Math.log(2);
+	
+	private int toBitScore(final int score, final double lambda, final double K) {
+		return (int) Math.round((lambda * score - Math.log(K)) / ln2);
+	}
+
 	private AlignedSequence toAlignedSequence(final String sequenceLine) {
 		//TODO CODE lots of error checking here
 		//TODO CODE nasty & brittle
@@ -184,7 +221,6 @@ public class LAST {
 				Integer.parseInt(seqline[2]),
 				Integer.parseInt(seqline[3]),
 				seqline[4].equals("+"));
-		
 	}
 
 	private void set3Lines(
@@ -227,6 +263,7 @@ public class LAST {
 		for (final SequenceSearchResult ssr: seqs) {
 			System.out.println("--------------------------------");
 			System.out.println(ssr.getEValue());
+			System.out.println(ssr.getBitScore());
 			final AlignedSequence as1 = ssr.getSequence1();
 			System.out.println(String.format("%s %s %s %s %s",
 					as1.getId(), as1.getSequenceLength(), as1.getAlignmentStart(),
