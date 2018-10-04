@@ -1,8 +1,11 @@
 package us.kbase.genehomology.service.api;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -15,7 +18,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PathParam;
@@ -33,6 +38,7 @@ import us.kbase.genehomology.core.NamespaceID;
 import us.kbase.genehomology.core.exceptions.IllegalParameterException;
 import us.kbase.genehomology.core.exceptions.MissingParameterException;
 import us.kbase.genehomology.core.exceptions.NoSuchNamespaceException;
+import us.kbase.genehomology.homology.AlignedSequence;
 import us.kbase.genehomology.homology.GeneHomologyImplementationException;
 import us.kbase.genehomology.homology.SequenceSearchResult;
 import us.kbase.genehomology.homology.last.LAST;
@@ -115,11 +121,55 @@ public class Namespaces {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@javax.ws.rs.Path(ServicePaths.NAMESPACE_SEARCH)
-	public Map<String, Object> searchNamespaces(
-			@Context HttpServletRequest request,
+	public Map<String, Object> searchNamespacesJson(
+			@Context final HttpServletRequest request,
 			@PathParam(ServicePaths.NAMESPACE_SELECT_PARAM) final String namespace)
 			throws IOException, NoSuchNamespaceException, MissingParameterException,
 				IllegalParameterException, GeneHomologyImplementationException {
+		final List<SequenceSearchResult> seqs = getAlignments(request, namespace);
+		//TODO NOW add impl version
+		final Map<String, Object> ret = new HashMap<>();
+		ret.put(Fields.ALIGN_NAMESPACES, new HashSet<>(Arrays.asList(fromNamespace(ns))));
+		ret.put(Fields.ALIGN_IMPLEMENTATION, ns.getDatabase().getImplementationName().getName());
+		ret.put(Fields.ALIGNMENTS, seqs.stream()
+				.map(s -> fromSearchResult(s))
+				.collect(Collectors.toList()));
+		return ret;
+	}
+	
+	@POST
+	@Produces("application/blasttab")
+	@javax.ws.rs.Path(ServicePaths.NAMESPACE_SEARCH)
+	public void searchNamespacesBlastTab(
+			@Context final HttpServletRequest request,
+			@Context final HttpServletResponse response,
+			@PathParam(ServicePaths.NAMESPACE_SELECT_PARAM) final String namespace)
+			throws NoSuchNamespaceException, MissingParameterException, IllegalParameterException,
+				FileNotFoundException, IOException, GeneHomologyImplementationException {
+		final List<SequenceSearchResult> seqs = getAlignments(request, namespace);
+		try (final ServletOutputStream sos = response.getOutputStream()) {
+			final Writer out = new BufferedWriter(new OutputStreamWriter(sos));
+			for (final SequenceSearchResult s: seqs) {
+				final AlignedSequence q = s.getQuery();
+				final AlignedSequence t = s.getTarget();
+				out.write(String.format("%s\t%s\t%.2f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+						q.getId(), t.getId(),
+						s.getPercentID() * 100,
+						s.getAlignmentLength(), s.getMismatches(), s.getGapOpenCount(),
+						q.getAlignmentStart() + 1, q.getAlignmentStart() + q.getAlignmentLength(),
+						t.getAlignmentStart() + 1, t.getAlignmentStart() + t.getAlignmentLength(),
+						s.getEValue(),
+						s.getBitScore()));
+			}
+			out.close();
+		}
+	}
+
+	private List<SequenceSearchResult> getAlignments(
+			final HttpServletRequest request,
+			final String namespace)
+			throws MissingParameterException, IllegalParameterException, NoSuchNamespaceException,
+				IOException, FileNotFoundException, GeneHomologyImplementationException {
 		final NamespaceID nsid = new NamespaceID(namespace);
 		if (!nsid.equals(ns.getID())) {
 			throw new NoSuchNamespaceException(namespace);
@@ -138,14 +188,7 @@ public class Namespaces {
 				Files.delete(tempFile);
 			}
 		}
-		//TODO NOW add impl version
-		final Map<String, Object> ret = new HashMap<>();
-		ret.put(Fields.ALIGN_NAMESPACES, new HashSet<>(Arrays.asList(fromNamespace(ns))));
-		ret.put(Fields.ALIGN_IMPLEMENTATION, ns.getDatabase().getImplementationName().getName());
-		ret.put(Fields.ALIGNMENTS, seqs.stream()
-				.map(s -> fromSearchResult(s))
-				.collect(Collectors.toList()));
-		return ret;
+		return seqs;
 	}
 
 	// this should live in the core code when it exists
@@ -171,17 +214,17 @@ public class Namespaces {
 		ret.put(Fields.ALIGN_E_VAL, ssr.getEValue());
 		ret.put(Fields.ALIGN_BIT_SCORE, ssr.getBitScore());
 		
-		ret.put(Fields.ALIGN_SEQ1_ID, ssr.getSequence1().getId());
-		ret.put(Fields.ALIGN_SEQ1_SEQ, ssr.getSequence1().getAlignedSequence());
-		ret.put(Fields.ALIGN_SEQ1_LEN, ssr.getSequence1().getSequenceLength());
-		ret.put(Fields.ALIGN_SEQ1_ALIGN_START, ssr.getSequence1().getAlignmentStart());
-		ret.put(Fields.ALIGN_SEQ1_ALIGN_LEN, ssr.getSequence1().getAlignmentLength());
+		ret.put(Fields.ALIGN_QUERY_ID, ssr.getQuery().getId());
+		ret.put(Fields.ALIGN_QUERY_SEQ, ssr.getQuery().getAlignedSequence());
+		ret.put(Fields.ALIGN_QUERY_LEN, ssr.getQuery().getSequenceLength());
+		ret.put(Fields.ALIGN_QUERY_ALIGN_START, ssr.getQuery().getAlignmentStart());
+		ret.put(Fields.ALIGN_QUERY_ALIGN_LEN, ssr.getQuery().getAlignmentLength());
 		
-		ret.put(Fields.ALIGN_SEQ2_ID, ssr.getSequence2().getId());
-		ret.put(Fields.ALIGN_SEQ2_SEQ, ssr.getSequence2().getAlignedSequence());
-		ret.put(Fields.ALIGN_SEQ2_LEN, ssr.getSequence2().getSequenceLength());
-		ret.put(Fields.ALIGN_SEQ2_ALIGN_START, ssr.getSequence2().getAlignmentStart());
-		ret.put(Fields.ALIGN_SEQ2_ALIGN_LEN, ssr.getSequence2().getAlignmentLength());
+		ret.put(Fields.ALIGN_TARGET_ID, ssr.getTarget().getId());
+		ret.put(Fields.ALIGN_TARGET_SEQ, ssr.getTarget().getAlignedSequence());
+		ret.put(Fields.ALIGN_TARGET_LEN, ssr.getTarget().getSequenceLength());
+		ret.put(Fields.ALIGN_TARGET_ALIGN_START, ssr.getTarget().getAlignmentStart());
+		ret.put(Fields.ALIGN_TARGET_ALIGN_LEN, ssr.getTarget().getAlignmentLength());
 		return ret;
 	}
 	
