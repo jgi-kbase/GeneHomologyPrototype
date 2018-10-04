@@ -151,12 +151,11 @@ public class Namespaces {
 			final Writer out = new BufferedWriter(new OutputStreamWriter(sos));
 			for (final SequenceSearchResult s: seqs) {
 				final AlignedSequence q = s.getQuery();
-				final AlignedSequence t= s.getTarget();
+				final AlignedSequence t = s.getTarget();
 				out.write(String.format("%s\t%s\t%.2f\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 						q.getId(), t.getId(),
 						s.getPercentID() * 100,
-						s.getAlignmentLength(), s.getMismatches(),
-						s.getGapOpenCount(),
+						s.getAlignmentLength(), s.getMismatches(), s.getGapOpenCount(),
 						q.getAlignmentStart() + 1, q.getAlignmentStart() + q.getAlignmentLength(),
 						t.getAlignmentStart() + 1, t.getAlignmentStart() + t.getAlignmentLength(),
 						s.getEValue(),
