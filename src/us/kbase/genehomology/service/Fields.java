@@ -51,26 +51,26 @@ public class Fields {
 	/** The alignment bit score. */
 	public static final String ALIGN_BIT_SCORE = "bitscore";
 	/** The ID of the first sequence. */
-	public static final String ALIGN_SEQ1_ID = "id1";
+	public static final String ALIGN_QUERY_ID = "queryid";
 	/** The aligned first sequence. */
-	public static final String ALIGN_SEQ1_SEQ = "alignseq1";
+	public static final String ALIGN_QUERY_SEQ = "queryalignseq";
 	/** The length of the first sequence. */
-	public static final String ALIGN_SEQ1_LEN = "lenseq1";
+	public static final String ALIGN_QUERY_LEN = "querylenseq";
 	/** The start of the alignment for first sequence. */
-	public static final String ALIGN_SEQ1_ALIGN_START = "alignstart1";
+	public static final String ALIGN_QUERY_ALIGN_START = "queryalignstart";
 	/** The length of the alignment for first sequence. */
-	public static final String ALIGN_SEQ1_ALIGN_LEN = "alignlen1";
+	public static final String ALIGN_QUERY_ALIGN_LEN = "queryalignlen";
 	
 	/** The ID of the second sequence. */
-	public static final String ALIGN_SEQ2_ID = "id2";
+	public static final String ALIGN_TARGET_ID = "targetid";
 	/** The aligned second sequence. */
-	public static final String ALIGN_SEQ2_SEQ = "alignseq2";
+	public static final String ALIGN_TARGET_SEQ = "targetalignseq";
 	/** The length of the second sequence. */
-	public static final String ALIGN_SEQ2_LEN = "lenseq2";
+	public static final String ALIGN_TARGET_LEN = "targetlenseq";
 	/** The start of the alignment for second sequence. */
-	public static final String ALIGN_SEQ2_ALIGN_START = "alignstart2";
+	public static final String ALIGN_TARGET_ALIGN_START = "targetalignstart";
 	/** The length of the alignment for second sequence. */
-	public static final String ALIGN_SEQ2_ALIGN_LEN = "alignlen2";
+	public static final String ALIGN_TARGET_ALIGN_LEN = "targetalignlen";
 	
 	/* errors */
 	

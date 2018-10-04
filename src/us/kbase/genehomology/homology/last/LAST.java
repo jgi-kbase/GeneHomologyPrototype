@@ -198,8 +198,8 @@ public class LAST {
 		final double eVal = Double.parseDouble(line1[3].substring(2));
 		final int score = Integer.parseInt(line1[1].substring(6));
 		return new SequenceSearchResult(
+				toAlignedSequence(recordLines.get(2)), // query is 2nd sequence
 				toAlignedSequence(recordLines.get(1)),
-				toAlignedSequence(recordLines.get(2)),
 				eVal,
 				toBitScore(score, lambda, K));
 	}
@@ -264,11 +264,11 @@ public class LAST {
 			System.out.println("--------------------------------");
 			System.out.println(ssr.getEValue());
 			System.out.println(ssr.getBitScore());
-			final AlignedSequence as1 = ssr.getSequence1();
+			final AlignedSequence as1 = ssr.getQuery();
 			System.out.println(String.format("%s %s %s %s %s",
 					as1.getId(), as1.getSequenceLength(), as1.getAlignmentStart(),
 					as1.getAlignmentLength(), as1.isForwardStrand()));
-			final AlignedSequence as2 = ssr.getSequence2();
+			final AlignedSequence as2 = ssr.getTarget();
 			System.out.println(String.format("%s %s %s %s %s",
 					as2.getId(), as2.getSequenceLength(), as2.getAlignmentStart(),
 					as2.getAlignmentLength(), as2.isForwardStrand()));

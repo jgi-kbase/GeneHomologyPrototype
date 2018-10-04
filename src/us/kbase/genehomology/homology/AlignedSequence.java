@@ -12,6 +12,8 @@ public class AlignedSequence {
 	final private boolean forwardStrand;
 
 	// could use a builder, although everything is required
+	// coordinates are 0 based
+	// alignment length is the length of the aligned portion of the sequence without gaps
 	public AlignedSequence(
 			final String id,
 			final int sequenceLength,
@@ -49,6 +51,28 @@ public class AlignedSequence {
 
 	public int getAlignmentLength() {
 		return alignmentLength;
+	}
+	
+	public int getAlignmentLengthWithGaps() {
+		return alignedSequence.length();
+	}
+	
+	// could memoize if needed
+	public int getGapOpenCount() {
+		boolean open = false;
+		int openCount = 0;
+		for (final char c: alignedSequence.toCharArray()) {
+			if (c == '-') {
+				if (!open) {
+					openCount++;
+					open = true;
+				}
+				// otherwise do nothing
+			} else {
+				open = false;
+			}
+		}
+		return openCount;
 	}
 
 	@Override
